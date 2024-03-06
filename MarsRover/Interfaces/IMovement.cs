@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MarsRovers
+namespace MarsRovers.Interfaces
 {
-    public enum Direction
+    public interface IMovement
     {
-        North,
-        East,
-        South,
-        West,
+        void Move(ref int x, ref int y, string direction, int distance);
     }
 }

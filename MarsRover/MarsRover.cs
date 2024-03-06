@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarsRovers.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,77 +13,42 @@ namespace MarsRovers
         public int y;
         public string direction;
 
-        public MarsRover()
+        private readonly IMovement movement;
+        private readonly ITurn turn;
+        private readonly IPositionReporter positionReporter;
+
+        public MarsRover(IMovement movement,ITurn turn, IPositionReporter positionReporter)
         {
-            x = 0;
-            y = 0;
+            this.turn = turn ?? throw new ArgumentNullException(nameof(turn));
+            this.movement = movement ?? throw new ArgumentNullException(nameof(movement));
+            this.positionReporter = positionReporter ?? throw new ArgumentNullException(nameof(positionReporter));
+
+            x = 1;
+            y = 1;
             direction = "South";
         }
 
         public void Move(int distance)
         {
-            switch (direction)
-            {
-                case "North":
-                    y = Math.Max(1, Math.Min(100, y - distance));
-                    break;
-                case "East":
-                    x = Math.Max(1, Math.Min(100, x + distance));
-                    break;
-                case "South":
-                    y = Math.Max(1, Math.Min(100, y + distance));
-                    break;
-                case "West":
-                    x = Math.Max(1, Math.Min(100, x - distance));
-                    break;
-            }
-
+            movement.Move(ref x, ref y, direction, distance);
             ReportPosition();
         }
 
         public void TurnLeft()
         {
-            switch (direction)
-            {
-                case "South":
-                    direction = "East";
-                    break;
-                case "North":
-                    direction = "West";
-                    break;
-                case "East":
-                    direction = "North";
-                    break;
-                case "West":
-                    direction = "South";
-                    break;
-            }
+            direction = turn.Turn(direction, "Left");
             ReportPosition();
         }
 
         public void TurnRight()
         {
-            switch (direction)
-            {
-                case "South":
-                    direction = "West";
-                    break;
-                case "North":
-                    direction = "East";
-                    break;
-                case "East":
-                    direction = "South";
-                    break;
-                case "West":
-                    direction = "North";
-                    break;
-            }
+            direction = turn.Turn(direction, "Right");
             ReportPosition();
         }
 
         public void ReportPosition()
         {
-            Console.WriteLine($"Current Position: {y * 100 + x + 1} {direction}");
+            positionReporter.ReportPosition(x, y, direction);
         }
     }
 }
